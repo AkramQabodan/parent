@@ -1,9 +1,10 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import {
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { AuthStore } from '../auth.store';
 
 @Component({
   selector: 'app-login-page',
@@ -13,9 +14,10 @@ import { catchError } from 'rxjs/operators';
   imports: [ReactiveFormsModule],
 })
 export class LoginPageComponent {
-  private formBuilder = inject(FormBuilder);
-  private http = inject(HttpClient);
-  private router = inject(Router);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly authStore = inject(AuthStore);
+  readonly loading = this.authStore.loading;
+  readonly errorMessage = this.authStore.errorMessage;
   imagePath = 'assets/images/modern-office-room-with-white-walls-1024x683.webp';
 
   loginForm = this.formBuilder.group({
@@ -23,49 +25,22 @@ export class LoginPageComponent {
     password: ['', [Validators.required]],
   });
 
-  loading = false;
-  errorMessage: string | null = null;
-
   onSubmit(): void {
     if (this.loginForm.invalid) {
       return;
     }
 
-    this.loading = true;
-    this.errorMessage = null;
-
-    const payload = this.loginForm.value;
-
-    this.http
-      .post('/login', payload)
-      .pipe(
-        catchError((error) => {
-          this.loading = false;
-          this.errorMessage =
-            error.error.error || 'An error occurred. Please try again.';
-          return of(null);
-        })
-      )
-      .subscribe((response) => {
-        this.loading = false;
-        if (response) {
-          this.router.navigate(['/users']);
-        }
-      });
+    const { username, password } = this.loginForm.getRawValue();
+    this.authStore.login(username, password);
   }
 
   get emailError() {
-    return (
-      this.loginForm.get('username')?.invalid &&
-      (this.loginForm.get('username')?.dirty ||
-        this.loginForm.get('username')?.touched)
-    );
+    const control = this.loginForm.get('username');
+    return control?.invalid && (control.dirty || control.touched);
   }
+
   get passwordError() {
-    return (
-      this.loginForm.get('password')?.invalid &&
-      (this.loginForm.get('password')?.dirty ||
-        this.loginForm.get('password')?.touched)
-    );
+    const control = this.loginForm.get('password');
+    return control?.invalid && (control.dirty || control.touched);
   }
 }

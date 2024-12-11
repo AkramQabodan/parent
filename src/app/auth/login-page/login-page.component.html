@@ -1,5 +1,5 @@
 <main
-  class="flex-grow bg-gray-100 flex items-center justify-center h-[calc(100vh-64px)] p-4"
+  class="flex-grow bg-gray-100 flex items-center justify-center h-[calc(100vh-72px)] max-md:h-[calc(100vh-64px)] p-4"
 >
   <div
     class="bg-white rounded-lg shadow-lg flex flex-col md:flex-row w-full max-w-4xl overflow-hidden"
@@ -34,7 +34,7 @@
           />
           @if (emailError) {
           <div class="text-red-600 text-sm mt-1">
-            @if (loginForm.get('username')?.errors?.['required']) { Username is
+            @if (loginForm.get('username')?.errors?.['required']) { username is
             required. }
           </div>
           }
@@ -71,9 +71,9 @@
         >
           Login
         </button>
-        @if (errorMessage) {
+        @if (errorMessage()) {
         <div class="text-red-600 text-sm mt-4">
-          {{ errorMessage }}
+          {{ errorMessage() }}
         </div>
         }
       </form>
