@@ -1,4 +1,8 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  importProvidersFrom,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import {
@@ -14,11 +18,12 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
 import { baseInterceptor } from './core/interceptors/base/base-interceptor.interceptor';
 
+import { DialogModule } from '@angular/cdk/dialog';
 import { provideToastr } from 'ngx-toastr';
 import { authInterceptor } from './core/interceptors/authInterceptor/auth-interceptor.interceptor';
-
 export const appConfig: ApplicationConfig = {
   providers: [
+    importProvidersFrom(DialogModule),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),

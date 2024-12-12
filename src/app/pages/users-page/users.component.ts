@@ -1,18 +1,23 @@
+import { Dialog, DialogModule } from '@angular/cdk/dialog';
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ViewContainerRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { UserFormComponent } from './components/user-form/user-form.component';
 import { User, UserStore } from './store/users.store';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [RouterModule, CommonModule],
+  imports: [RouterModule, CommonModule, DialogModule],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css',
 })
 export class UsersComponent {
   userStore = inject(UserStore);
+  dialog = inject(Dialog);
   selectedUser = signal<User | null>(null);
+
+  constructor(private viewContainerRef: ViewContainerRef) {}
 
   ngOnInit() {
     this.userStore.fetchUsers().subscribe();
@@ -54,6 +59,21 @@ export class UsersComponent {
 
   viewUser(id: number) {
     this.userStore.fetchSingleUser(id);
+  }
+
+  onCreate() {
+    this.dialog.open(UserFormComponent);
+  }
+
+  editUser(event: MouseEvent, id: number | undefined) {
+    event.stopPropagation();
+    if (id) {
+      this.dialog.open(UserFormComponent, {
+        data: {
+          id: id,
+        },
+      });
+    }
   }
 
   deleteUser(event: MouseEvent, id: number | undefined) {

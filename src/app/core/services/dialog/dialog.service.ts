@@ -1,69 +1,51 @@
-import { isPlatformBrowser } from '@angular/common';
-import {
-  ComponentRef,
-  Inject,
-  Injectable,
-  PLATFORM_ID,
-  Type,
-  ViewContainerRef,
-} from '@angular/core';
-import { DialogComponent } from '../../../shared/dialog/dialog.component';
+import { Dialog } from '@angular/cdk/dialog'; // CDK Approach
+import { Injectable, TemplateRef, Type } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
-export class DialogService {
-  private dialogComponentRef: ComponentRef<DialogComponent> | null = null;
+export class CdkDialogService {
+  constructor(private dialog: Dialog) {}
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  // CDK Dialog implementation (previous example)
+  open<T>(component: Type<T>, config?: any) {
+    return this.dialog.open(component, config);
+  }
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class NativeDialogService {
+  private dialogElement: HTMLDialogElement | null = null;
 
   /**
-   * Open a dialog with any component
-   * @param vcr ViewContainerRef to create the dialog in
-   * @param component The component to display in the dialog
-   * @param data Optional data to pass to the component
+   * Open a dialog using native HTML dialog element
+   * @param content HTML content or component template
    */
-  open<T extends object>(
-    vcr: ViewContainerRef,
-    component: Type<T>,
-    data?: Partial<T>
-  ) {
-    // Ensure we're in a browser environment
-    if (!isPlatformBrowser(this.platformId)) {
-      console.warn('Dialog cannot be opened in non-browser environment');
-      return null;
+  open(content: string | TemplateRef<any>) {
+    // Create dialog if it doesn't exist
+    if (!this.dialogElement) {
+      this.dialogElement = document.createElement('dialog');
+      document.body.appendChild(this.dialogElement);
     }
 
-    // Close any existing dialog
-    this.close();
-
-    // Create the dialog component
-    this.dialogComponentRef = vcr.createComponent(DialogComponent);
-
-    // Create the content component inside the dialog
-    const contentComponentRef =
-      this.dialogComponentRef.instance.contentContainer.createComponent(
-        component
-      );
-
-    // Pass data to the content component if provided
-    if (data) {
-      // Type-safe way to assign properties
-      Object.keys(data).forEach((key) => {
-        (contentComponentRef.instance as any)[key] = (data as any)[key];
-      });
+    // Set content
+    if (typeof content === 'string') {
+      this.dialogElement.innerHTML = content;
+    } else {
+      // For Angular templates, you'd need additional rendering logic
+      // This is a simplified example
     }
 
-    return contentComponentRef.instance;
+    // Show the dialog
+    this.dialogElement.showModal();
   }
 
   /**
-   * Close the currently open dialog
+   * Close the dialog
    */
   close() {
-    if (this.dialogComponentRef) {
-      this.dialogComponentRef.destroy();
-      this.dialogComponentRef = null;
-    }
+    this.dialogElement?.close();
   }
 }
