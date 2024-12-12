@@ -15,13 +15,17 @@ import { routes } from './app.routes';
 import { baseInterceptor } from './core/interceptors/base/base-interceptor.interceptor';
 
 import { provideToastr } from 'ngx-toastr';
+import { authInterceptor } from './core/interceptors/authInterceptor/auth-interceptor.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    provideHttpClient(withInterceptors([baseInterceptor]), withFetch()),
+    provideHttpClient(
+      withInterceptors([baseInterceptor, authInterceptor]),
+      withFetch()
+    ),
     provideAnimations(),
     provideToastr({
       timeOut: 2000,

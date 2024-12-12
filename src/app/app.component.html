@@ -10,11 +10,14 @@
         <a href="#" class="text-gray-700 hover:text-purple-600">Home</a>
         <a href="#" class="text-gray-700 hover:text-purple-600">About</a>
         <a href="#" class="text-gray-700 hover:text-purple-600">Contact</a>
+        @if (isAuthenticated()){
         <button
+          (click)="logOut()"
           class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
         >
-          Login
+          Logout
         </button>
+        }
       </nav>
 
       <!-- Mobile Menu Button (Hamburger) -->
