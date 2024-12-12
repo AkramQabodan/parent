@@ -2,6 +2,7 @@ import { Dialog, DialogModule } from '@angular/cdk/dialog';
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal, ViewContainerRef } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { ConfirmDeleteComponent } from './components/confirm-delete/confirm-delete.component';
 import { UserFormComponent } from './components/user-form/user-form.component';
 import { User, UserStore } from './store/users.store';
 
@@ -76,14 +77,23 @@ export class UsersComponent {
     }
   }
 
-  deleteUser(event: MouseEvent, id: number | undefined) {
-    event.stopPropagation();
+  deleteUser(id: number | undefined) {
     if (id) {
       this.userStore.deleteUser(id).subscribe();
       if (id === this.selectedUser()?.id) {
         this.deSelectUser();
       }
     }
+  }
+
+  confirmDelete(event: MouseEvent, id: number | undefined) {
+    event.stopPropagation();
+    this.dialog.open(ConfirmDeleteComponent, {
+      data: {
+        id,
+        confirm: () => this.deleteUser(id),
+      },
+    });
   }
 
   selectUser(user: User) {
