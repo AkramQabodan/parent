@@ -1,37 +1,56 @@
-import { Component, HostListener, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { UserStore } from './store/users.store';
+import { User, UserStore } from './store/users.store';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, CommonModule],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css',
 })
 export class UsersComponent {
-  @HostListener('window:scroll', ['$event'])
   userStore = inject(UserStore);
+  selectedUser = signal<User | null>(null);
 
   ngOnInit() {
-    // Load first page of users
     this.userStore.fetchUsers().subscribe((res) => {
       console.log(res);
     });
   }
 
-  // Infinite Scrolling
-  onWindowScroll() {
+  onScroll(event: Event): void {
     const { pagination, loading } = this.userStore;
 
-    // Check if we're at the bottom of the page and there are more pages
+    // Check if the user has scrolled to the bottom of the content
+    const scrollPosition = event.target as HTMLElement;
+    const isAtBottom =
+      scrollPosition.scrollHeight ===
+      scrollPosition.scrollTop + scrollPosition.clientHeight;
+
+    // Only fetch the next page if we're at the bottom, not loading, and there are more pages
     if (
-      window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 &&
+      isAtBottom &&
       !loading() &&
       pagination().page < pagination().total_pages
     ) {
+      // Fetch the next page
+      const nextPage = pagination().page + 1;
+      this.userStore.fetchUsers(nextPage).subscribe();
+    }
+  }
+
+  onWindowScroll() {
+    const { pagination, loading } = this.userStore;
+
+    if (
+      window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 &&
+      !loading() && // Check if not loading
+      pagination().page < pagination().total_pages // Check if more pages are available
+    ) {
       // Load next page
-      this.userStore.fetchUsers(pagination().page + 1);
+      this.userStore.fetchUsers(pagination().page + 1).subscribe();
     }
   }
 
@@ -41,5 +60,14 @@ export class UsersComponent {
 
   deleteUser(id: number) {
     this.userStore.deleteUser(id);
+  }
+
+  selectUser(user: User) {
+    this.selectedUser.set(user);
+    console.log(this.userStore.pagination());
+  }
+
+  deSelectUser() {
+    this.selectedUser.set(null);
   }
 }

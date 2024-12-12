@@ -194,3 +194,43 @@ button.toast-close-button {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  overflow: hidden;
+}
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari, and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge, and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  /* Styled scrollbar with light purple */
+  .scrollbar-light-purple::-webkit-scrollbar {
+    width: 8px; /* Set the width of the scrollbar */
+  }
+
+  .scrollbar-light-purple::-webkit-scrollbar-track {
+    background: #f3f4f6; /* Light grey background for track */
+  }
+
+  .scrollbar-light-purple::-webkit-scrollbar-thumb {
+    background-color: #b794f4; /* Light purple color for the thumb */
+    border-radius: 8px; /* Rounded corners for the thumb */
+  }
+
+  .scrollbar-light-purple::-webkit-scrollbar-thumb:hover {
+    background-color: #9f68d3; /* Darker purple on hover */
+  }
+
+  /* For Firefox */
+  .scrollbar-light-purple {
+    scrollbar-width: thin;
+    scrollbar-color: #b794f4 #f3f4f6; /* Thumb and track colors for Firefox */
+  }
+}

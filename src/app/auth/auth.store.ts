@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { ToastrService } from 'ngx-toastr';
-import { LocalStorageService } from '../core/services/local-storage.service';
+import { LocalStorageService } from '../core/services/localStorage/local-storage.service';
 
 interface AuthState {
   loading: boolean;
