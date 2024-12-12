@@ -15,9 +15,7 @@ export class UsersComponent {
   selectedUser = signal<User | null>(null);
 
   ngOnInit() {
-    this.userStore.fetchUsers().subscribe((res) => {
-      console.log(res);
-    });
+    this.userStore.fetchUsers().subscribe();
   }
 
   onScroll(event: Event): void {
@@ -58,13 +56,18 @@ export class UsersComponent {
     this.userStore.fetchSingleUser(id);
   }
 
-  deleteUser(id: number) {
-    this.userStore.deleteUser(id);
+  deleteUser(event: MouseEvent, id: number | undefined) {
+    event.stopPropagation();
+    if (id) {
+      this.userStore.deleteUser(id).subscribe();
+      if (id === this.selectedUser()?.id) {
+        this.deSelectUser();
+      }
+    }
   }
 
   selectUser(user: User) {
     this.selectedUser.set(user);
-    console.log(this.userStore.pagination());
   }
 
   deSelectUser() {
